@@ -49,7 +49,7 @@ lazy val core = Project(
       },
     // ---- publishing ----
     // publishArtifact in (Compile, packageDoc) := false,
-    publishArtifact in (Compile, packageSrc) := false,
+    // publishArtifact in (Compile, packageSrc) := false,
     publishArtifact in Test := false,
     publishMavenStyle := true,
     publishTo :=
