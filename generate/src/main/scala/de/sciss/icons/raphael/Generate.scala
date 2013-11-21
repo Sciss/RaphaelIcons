@@ -1,22 +1,11 @@
-package de.sciss.svgpath
+package de.sciss.icons.raphael
 
 import org.apache.batik.parser.{PathHandler, PathParser}
-import java.io.StringWriter
+import java.io.{FileInputStream, StringWriter}
+import java.util.Properties
 
 object Generate extends App {
-  val LOG_ENABLED = true
-
-  val pathEye   =
-    "M16,8.286C8.454,8.286,2.5,16,2.5,16s5.954,7.715,13.5,7.715c5.771,0,13.5-7.715,13.5-7.715S21.771,8.286,16,8.286" +
-    "zM16,20.807c-2.649,0-4.807-2.157-4.807-4.807s2.158-4.807,4.807-4.807s4.807,2.158,4.807,4.807" +
-    "S18.649,20.807,16,20.807zM16,13.194c-1.549,0-2.806,1.256-2.806,2.806c0,1.55,1.256,2.806,2.806,2.806" +
-    "c1.55,0,2.806-1.256,2.806-2.806C18.806,14.451,17.55,13.194,16,13.194z"
-
-  val pathInfo  =
-    "M16,1.466C7.973,1.466,1.466,7.973,1.466,16c0,8.027,6.507,14.534,14.534,14.534c8.027,0,14.534-6.507,14.534-14.534" +
-    "C30.534,7.973,24.027,1.466,16,1.466z M14.757,8h2.42v2.574h-2.42V8z M18.762,23.622H16.1" +
-    "c-1.034,0-1.475-0.44-1.475-1.496v-6.865c0-0.33-0.176-0.484-0.484-0.484h-0.88V12.4h2.662" +
-    "c1.035,0,1.474,0.462,1.474,1.496v6.887c0,0.309,0.176,0.484,0.484,0.484h0.88V23.622z"
+  final val LOG_ENABLED = false
 
   def log(what: => String): Unit = if (LOG_ENABLED) println(s"[log] $what")
 
@@ -29,6 +18,9 @@ object Generate extends App {
     private var y       = 0f
     private var cx      = 0f
     private var cy      = 0f
+
+    private val indent  = "    p."
+    private val eol     = ";\n"
 
     private var ended   = false
 
@@ -49,27 +41,28 @@ object Generate extends App {
     private def newPath(): Unit = {
       gpIdx += 1
       path   = s"p$gpIdx"
-      out.write(s"val $path = new GeneralPath(Path2D.WIND_EVEN_ODD)\n")
+      // out.write(s"val $path = new GeneralPath(Path2D.WIND_EVEN_ODD)\n")
     }
 
     def endPath(): Unit = {
       log("endPath()")
       require(!ended, s"Path has already ended")
-      out.write(s"$path.closePath()")
+      // out.write(s"$path.closePath()")
       ended = true
     }
 
     def movetoRel(p1: Float, p2: Float): Unit = {
       log(s"movetoRel($p1, $p2)")
+      ???
     }
 
-    def movetoAbs(x1: Float, y1: Float): Unit = {
-      log(s"movetoAbs($x1, $y1)")
-      cx  = x1
-      cy  = y1
-      x   = x1
-      y   = y1
-      out.write(s"$path.moveTo(${cx}f, ${cy}f)\n")
+    def movetoAbs(x3: Float, y3: Float): Unit = {
+      log(s"movetoAbs($x3, $y3)")
+      cx  = x3
+      cy  = y3
+      x   = x3
+      y   = y3
+      pathMoveTo(x, y)
     }
 
     def closePath(): Unit = {
@@ -79,14 +72,22 @@ object Generate extends App {
       //      newPath()
     }
 
-    def linetoRel(p1: Float, p2: Float): Unit = {
-      log(s"linetoRel($p1, $p2)")
-      ???
+    def linetoRel(x3: Float, y3: Float): Unit = {
+      log(s"linetoRel($x3, $y3)")
+      x += x3
+      y += y3
+      cx = x
+      cy = y
+      pathLineTo(x, y)
     }
 
-    def linetoAbs(p1: Float, p2: Float): Unit = {
-      log(s"linetoAbs($p1, $p2)")
-      ???
+    def linetoAbs(x3: Float, y3: Float): Unit = {
+      log(s"linetoAbs($x3, $y3)")
+      x   = x3
+      y   = y3
+      cx  = x
+      cy  = y
+      pathLineTo(x, y)
     }
 
     def linetoHorizontalRel(x3: Float): Unit = {
@@ -94,7 +95,7 @@ object Generate extends App {
       x += x3
       cx = x
       cy = y
-      out.write(s"$path.lineTo(${x}f, ${y}f)\n")
+      pathLineTo(x, y)
     }
 
     def linetoHorizontalAbs(x3: Float): Unit = {
@@ -102,7 +103,7 @@ object Generate extends App {
       x  = x3
       cx = x
       cy = y
-      out.write(s"$path.lineTo(${x}f, ${y}f)\n")
+      pathLineTo(x, y)
     }
 
     def linetoVerticalRel(y3: Float): Unit = {
@@ -110,7 +111,7 @@ object Generate extends App {
       cx = x
       y += y3
       cy = y
-      out.write(s"$path.lineTo(${x}f, ${y}f)\n")
+      pathLineTo(x, y)
     }
 
     def linetoVerticalAbs(y3: Float): Unit = {
@@ -118,7 +119,7 @@ object Generate extends App {
       cx = x
       y  = y3
       cy = y
-      out.write(s"$path.lineTo(${x}f, ${y}f)\n")
+      pathLineTo(x, y)
     }
 
     def curvetoCubicRel(x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float): Unit = {
@@ -129,7 +130,7 @@ object Generate extends App {
       cy      = y + y2
       x      += x3
       y      += y3
-      out.write(s"$path.curveTo(${x0}f, ${y0}f, ${cx}f, ${cy}f, ${x}f, ${y}f)\n")
+      pathCurveTo(x0, y0, cx, cy, x, y)
     }
 
     def curvetoCubicAbs(x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float): Unit = {
@@ -138,7 +139,7 @@ object Generate extends App {
       cy = y2
       x  = x3
       y  = y3
-      out.write(s"$path.curveTo(${x1}f, ${y1}f, ${cx}f, ${cy}f, ${x}f, ${y}f)\n")
+      pathCurveTo(x1, y1, cx, cy, x, y)
     }
 
     def curvetoCubicSmoothRel(x2: Float, y2: Float, x3: Float, y3: Float): Unit = {
@@ -149,7 +150,7 @@ object Generate extends App {
       cy     = y + y2
       x     += x3
       y     += y3
-      out.write(s"$path.curveTo(${x1}f, ${y1}f, ${cx}f, ${cy}f, ${x}f, ${y}f)\n")
+      pathCurveTo(x1, y1, cx, cy, x, y)
     }
 
     def curvetoCubicSmoothAbs(x2: Float, y2: Float, x3: Float, y3: Float): Unit = {
@@ -160,7 +161,7 @@ object Generate extends App {
       cy      = y2
       x       = x3
       y       = y3
-      out.write(s"$path.curveTo(${x1}f, ${y1}f, ${cx}f, ${cy}f, ${x}f, ${y}f)\n")
+      pathCurveTo(x1, y1, cx, cy, x, y)
     }
 
     def curvetoQuadraticRel(p1: Float, p2: Float, p3: Float, p4: Float): Unit = {
@@ -192,11 +193,64 @@ object Generate extends App {
       log(s"arcAbs($p1, $p2, $p3, $p4, $p5, $p6, $p7)")
       ???
     }
+
+    private def pathMoveTo(x: Float, y: Float): Unit = {
+      out.write(s"${indent}moveTo(${x}f, ${y}f)$eol")
+    }
+
+    private def pathLineTo(x: Float, y: Float): Unit = {
+      out.write(s"${indent}lineTo(${x}f, ${y}f)$eol")
+    }
+
+    private def pathCurveTo(x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float): Unit = {
+      out.write(s"${indent}curveTo(${x1}f, ${y1}f, ${x2}f, ${y2}f, ${x3}f, ${y3}f)$eol")
+    }
   }
 
   val parser  = new PathParser
-  val h       = new Handler
-  parser.setPathHandler(h)
-  parser.parse(pathInfo)
-  println(h.result())
+  val is      = getClass.getResourceAsStream("paths.txt")
+  val source  = io.Source.fromInputStream(is, "UTF-8")
+  val entries = source.getLines().flatMap {
+    case s if s.nonEmpty && !s.startsWith("#") =>
+      val t = s.trim()
+      val Array(key, value) = t.split("=")
+      Some(key -> value)
+
+    case _ => None
+  } .toIndexedSeq
+  is.close()
+
+  print(
+    """package de.sciss.icons.raphael;
+      |
+      |import java.awt.Shape;
+      |import java.awt.geom.GeneralPath;
+      |import java.awt.geom.Path2D;
+      |
+      |public class Shapes {
+      |  private Shapes() {}
+      |""".stripMargin
+  )
+
+  entries.zipWithIndex.foreach { case ((name, path), idx) =>
+    //    if (idx % 14 == 0) {
+    //      if (idx > 0) println("lineFeed()")
+    //    } else {
+    //      println("moveRight()")
+    //    }
+
+    val h = new Handler
+    parser.setPathHandler(h)
+    parser.parse(path)
+    println()
+    println(s"  public static void ${name.capitalize}(Path2D p) {")
+    print  (h.result())
+    println( "  }")
+  }
+  println("}")
+
+  //  println("\n///////////////////// DEMO\n")
+  //  entries.foreach { case (name, _) =>
+  //    println(s"")
+  //  }
 }
