@@ -1,8 +1,7 @@
 package de.sciss.icons.raphael
 
 import org.apache.batik.parser.{PathHandler, PathParser}
-import java.io.{FileInputStream, StringWriter}
-import java.util.Properties
+import java.io.StringWriter
 
 object Generate extends App {
   final val LOG_ENABLED = false
@@ -51,9 +50,13 @@ object Generate extends App {
       ended = true
     }
 
-    def movetoRel(p1: Float, p2: Float): Unit = {
-      log(s"movetoRel($p1, $p2)")
-      ???
+    def movetoRel(x3: Float, y3: Float): Unit = {
+      log(s"movetoRel($x3, $y3)")
+      x  += x3
+      y  += y3
+      cx  = cx
+      cy  = cy
+      pathMoveTo(x, y)
     }
 
     def movetoAbs(x3: Float, y3: Float): Unit = {

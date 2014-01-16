@@ -5,7 +5,7 @@ name := projectName
 // ---- base settings ----
 
 lazy val commonSettings = Project.defaultSettings ++ Seq(
-  version         := "1.0.0",
+  version         := "1.0.1-SNAPSHOT",
   organization    := "de.sciss",
   description     := "Icon set designed by Dmitry Baranovskiy",
   homepage        := Some(url("https://github.com/Sciss/" + projectName)),
@@ -109,6 +109,17 @@ lazy val gen = Project(
   settings  = commonSettings ++ Seq(
     libraryDependencies ++= Seq(
       "org.apache.xmlgraphics" % "batik-parser" % "1.7"
-    )
+    ),
+    initialCommands in console :=
+      """import org.apache.batik.parser.{PathHandler, PathParser}
+        |import de.sciss.icons.raphael._
+        |def path(str: String): String = {
+        |  val p = new PathParser
+        |  val h = new Generate.Handler
+        |  p.setPathHandler(h)
+        |  p.parse(str)
+        |  h.result()
+        |}
+        |""".stripMargin
   )
 )
