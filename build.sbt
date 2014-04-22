@@ -5,17 +5,17 @@ name := projectName
 // ---- base settings ----
 
 lazy val commonSettings = Project.defaultSettings ++ Seq(
-  version         := "1.0.1-SNAPSHOT",
-  organization    := "de.sciss",
-  description     := "Icon set designed by Dmitry Baranovskiy",
-  homepage        := Some(url("https://github.com/Sciss/" + projectName)),
-  licenses        := Seq("LGPL v2.1+" -> url("http://www.gnu.org/licenses/lgpl-2.1.txt")),
-  scalaVersion    := "2.10.3",
-  retrieveManaged := true,
+  version            := "1.0.1",
+  organization       := "de.sciss",
+  description        := "Icon set designed by Dmitry Baranovskiy",
+  homepage           := Some(url("https://github.com/Sciss/" + projectName)),
+  licenses           := Seq("LGPL v2.1+" -> url("http://www.gnu.org/licenses/lgpl-2.1.txt")),
+  scalaVersion       := "2.11.0",
+  crossScalaVersions := Seq("2.11.0", "2.10.4"),
+  // retrieveManaged := true,
   scalacOptions  ++= Seq(
-    "-no-specialization",
     // "-Xelide-below", "INFO", // elide debug logging!
-    "-deprecation", "-unchecked", "-feature"
+    "-deprecation", "-unchecked", "-feature", "-Xfuture"
   )
 )
 
@@ -25,7 +25,7 @@ lazy val root: Project = Project(
   id            = "root",
   base          = file("."),
   aggregate     = Seq(core, gen),
-  settings      = Project.defaultSettings ++ Seq(
+  settings      = commonSettings ++ Seq(
     packagedArtifacts := Map.empty
   )
 )
@@ -36,9 +36,14 @@ lazy val core = Project(
   id        = "raphael-icons",
   base      = file("core"),
   settings  = commonSettings ++ Seq(
-    libraryDependencies ++= Seq(
-      "org.scala-lang" % "scala-swing" % scalaVersion.value % "test"
-    ),
+    libraryDependencies += {
+      val sv    = scalaVersion.value
+      val swing = if (sv startsWith "2.10")
+        "org.scala-lang"         %  "scala-swing" % sv
+      else
+        "org.scala-lang.modules" %% "scala-swing" % "1.0.1"
+      swing % "test"
+    },
     sourceGenerators in Compile <+= (java2DGenerator in Compile),
     java2DGenerator in Compile <<=
       (resourceDirectory   in Compile in gen,
