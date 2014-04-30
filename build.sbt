@@ -5,13 +5,14 @@ name := projectName
 // ---- base settings ----
 
 lazy val commonSettings = Project.defaultSettings ++ Seq(
-  version            := "1.0.1",
+  version            := "1.0.2",
   organization       := "de.sciss",
   description        := "Icon set designed by Dmitry Baranovskiy",
   homepage           := Some(url("https://github.com/Sciss/" + projectName)),
   licenses           := Seq("LGPL v2.1+" -> url("http://www.gnu.org/licenses/lgpl-2.1.txt")),
   scalaVersion       := "2.11.0",
   crossScalaVersions := Seq("2.11.0", "2.10.4"),
+  javacOptions      ++= Seq("-source", "1.6", "-target", "1.6"),
   // retrieveManaged := true,
   scalacOptions  ++= Seq(
     // "-Xelide-below", "INFO", // elide debug logging!
