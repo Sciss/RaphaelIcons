@@ -10,7 +10,7 @@ object Generate extends App {
 
   class Handler extends PathHandler {
     private val out     = new StringWriter()
-    private var gpIdx   = 0
+    // private var gpIdx   = 0
     private var path    = ""
 
     private var x       = 0f
@@ -23,29 +23,34 @@ object Generate extends App {
 
     private var ended   = false
 
+    private var isFirst = false
+    private var startX  = 0f
+    private var startY  = 0f
+
     def result(): String = {
-      require(ended, s"Path has not yet ended")
+      require(ended, "Path has not yet ended")
       out.toString
     }
 
     def startPath(): Unit = {
       log("startPath()")
-      newPath()
+      // newPath()
       x   = 0
       y   = 0
       cx  = 0
       cy  = 0
+      isFirst = true
     }
 
-    private def newPath(): Unit = {
-      gpIdx += 1
-      path   = s"p$gpIdx"
-      // out.write(s"val $path = new GeneralPath(Path2D.WIND_EVEN_ODD)\n")
-    }
+    //    private def newPath(): Unit = {
+    //      gpIdx += 1
+    //      path   = s"p$gpIdx"
+    //      // out.write(s"val $path = new GeneralPath(Path2D.WIND_EVEN_ODD)\n")
+    //    }
 
     def endPath(): Unit = {
       log("endPath()")
-      require(!ended, s"Path has already ended")
+      require(!ended, "Path has already ended")
       // out.write(s"$path.closePath()")
       ended = true
     }
@@ -70,7 +75,19 @@ object Generate extends App {
 
     def closePath(): Unit = {
       log("closePath()")
-      //      out.write(s"$path.closePath()\n")
+      //      x   = 0
+      //      y   = 0
+      //      cx  = 0
+      //      cy  = 0
+      linetoAbs(startX, startY)
+
+      //      x   = startX
+      //      y   = startY
+      //      cx  = startX
+      //      cy  = startY
+      // out.write(s"${indent}closePath();\n")
+      isFirst = true
+
       //      out.write(s"g2.fill($path)\n")
       //      newPath()
     }
@@ -198,6 +215,11 @@ object Generate extends App {
     }
 
     private def pathMoveTo(x: Float, y: Float): Unit = {
+      if (isFirst) {
+        startX  = x
+        startY  = y
+        isFirst = false
+      }
       out.write(s"${indent}moveTo(${x}f, ${y}f)$eol")
     }
 
