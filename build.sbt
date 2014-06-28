@@ -119,9 +119,10 @@ lazy val gen = Project(
     initialCommands in console :=
       """import org.apache.batik.parser.{PathHandler, PathParser}
         |import de.sciss.icons.raphael._
-        |def path(str: String): String = {
+        |def path(str: String, scala: Boolean = true): String = {
         |  val p = new PathParser
         |  val h = new Generate.Handler
+        |  if (scala) h.eol = "\n"
         |  p.setPathHandler(h)
         |  p.parse(str)
         |  h.result()

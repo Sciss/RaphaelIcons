@@ -18,4 +18,5 @@ To see the source generation, run `sbt generate/run`. To compile the core projec
 
 ## Reminder to Self
 
-To publish, `sbt raphael-icons/publish-signed`.
+- to publish, `sbt raphael-icons/publish-signed`.
+- to try out path generation, `sbt generate/console` and then `path(<someString>)`.

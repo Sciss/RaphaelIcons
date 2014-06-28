@@ -18,8 +18,8 @@ object Generate extends App {
     private var cx      = 0f
     private var cy      = 0f
 
-    private val indent  = "    p."
-    private val eol     = ";\n"
+    var indent          = "    p."
+    var eol             = ";\n"
 
     private var ended   = false
 
