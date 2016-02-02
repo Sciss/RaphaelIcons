@@ -8,15 +8,15 @@ lazy val commonSettings = Project.defaultSettings ++ Seq(
   version            := "1.0.3-SNAPSHOT",
   organization       := "de.sciss",
   description        := "Icon set designed by Dmitry Baranovskiy",
-  homepage           := Some(url("https://github.com/Sciss/" + projectName)),
+  homepage           := Some(url(s"https://github.com/Sciss/$projectName")),
   licenses           := Seq("LGPL v2.1+" -> url("http://www.gnu.org/licenses/lgpl-2.1.txt")),
-  scalaVersion       := "2.11.4",
-  crossScalaVersions := Seq("2.11.4", "2.10.4"),
+  scalaVersion       := "2.11.7",
+  crossScalaVersions := Seq("2.11.7", "2.10.6"),
   javacOptions      ++= Seq("-source", "1.6", "-target", "1.6"),
   // retrieveManaged := true,
   scalacOptions  ++= Seq(
     // "-Xelide-below", "INFO", // elide debug logging!
-    "-deprecation", "-unchecked", "-feature", "-Xfuture"
+    "-deprecation", "-unchecked", "-feature", "-Xfuture", "-Xlint"
   )
 )
 
@@ -42,7 +42,7 @@ lazy val core = Project(
       val swing = if (sv startsWith "2.10")
         "org.scala-lang"         %  "scala-swing" % sv
       else
-        "org.scala-lang.modules" %% "scala-swing" % "1.0.1"
+        "org.scala-lang.modules" %% "scala-swing" % "1.0.2"
       swing % "test"
     },
     sourceGenerators in Compile <+= (java2DGenerator in Compile),
@@ -59,7 +59,7 @@ lazy val core = Project(
     publishArtifact in Test := false,
     publishMavenStyle := true,
     publishTo :=
-      Some(if (version.value endsWith "-SNAPSHOT")
+      Some(if (isSnapshot.value)
         "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
       else
         "Sonatype Releases"  at "https://oss.sonatype.org/service/local/staging/deploy/maven2"
