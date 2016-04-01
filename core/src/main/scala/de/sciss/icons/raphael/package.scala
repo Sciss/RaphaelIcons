@@ -1,7 +1,8 @@
 package de.sciss.icons
 
-import java.awt.geom.{Area, AffineTransform, GeneralPath, Path2D}
-import java.awt.{LinearGradientPaint, Paint, Graphics2D, RenderingHints, Color, Graphics, Component, Shape}
+import java.awt.geom.{AffineTransform, Area, GeneralPath, Path2D}
+import java.awt.{Color, Component, Graphics, Graphics2D, LinearGradientPaint, Paint, RenderingHints, Shape}
+import javax.swing.UIManager
 
 package object raphael {
   /** Creates a shape from a given shape function. */
@@ -16,6 +17,8 @@ package object raphael {
   val NoPaint     = new Color(0, 0, 0, 0): Paint
   /** Standard OS X style textured icon shadow color */
   val WhiteShadow = new Color(255, 255, 255, 127): Paint
+
+  private[this] lazy val isDarkSkin: Boolean = UIManager.getBoolean("dark-skin")
 
   /** Standard OS X style textured icon foreground color. Uses a vertical gradient from black to gray. */
   def TexturePaint(extent: Int = 32): Paint =

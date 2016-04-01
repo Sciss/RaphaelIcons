@@ -2,17 +2,24 @@ lazy val projectName = "RaphaelIcons"
 
 name := projectName
 
+// ---- test dependencies ----
+
+lazy val subminVersion = "0.1.0"
+
 // ---- base settings ----
 
-lazy val commonSettings = Project.defaultSettings ++ Seq(
+def basicJavaOpts = Seq("-source", "1.6")
+
+lazy val commonSettings = Seq(
   version            := "1.0.3-SNAPSHOT",
   organization       := "de.sciss",
   description        := "Icon set designed by Dmitry Baranovskiy",
   homepage           := Some(url(s"https://github.com/Sciss/$projectName")),
   licenses           := Seq("LGPL v2.1+" -> url("http://www.gnu.org/licenses/lgpl-2.1.txt")),
-  scalaVersion       := "2.11.7",
-  crossScalaVersions := Seq("2.11.7", "2.10.6"),
-  javacOptions      ++= Seq("-source", "1.6", "-target", "1.6"),
+  scalaVersion       := "2.11.8",
+  crossScalaVersions := Seq("2.11.8", "2.10.6"),
+  javacOptions                   := basicJavaOpts ++ Seq("-target", "1.6", "-encoding", "UTF-8"),
+  javacOptions in (Compile, doc) := basicJavaOpts,
   // retrieveManaged := true,
   scalacOptions  ++= Seq(
     // "-Xelide-below", "INFO", // elide debug logging!
@@ -22,21 +29,18 @@ lazy val commonSettings = Project.defaultSettings ++ Seq(
 
 // ---- sub-projects ----
 
-lazy val root: Project = Project(
-  id            = "root",
-  base          = file("."),
-  aggregate     = Seq(core, gen),
-  settings      = commonSettings ++ Seq(
+lazy val root = Project(id = "root", base = file("."))
+  .aggregate(core, gen)
+  .settings(commonSettings)
+  .settings(
     packagedArtifacts := Map.empty
   )
-)
 
 lazy val java2DGenerator = TaskKey[Seq[File]]("java2d-generate", "Generate Icon Java2D source code")
 
-lazy val core = Project(
-  id        = "raphael-icons",
-  base      = file("core"),
-  settings  = commonSettings ++ Seq(
+lazy val core = Project(id = "raphael-icons", base = file("core"))
+  .settings(commonSettings)
+  .settings(
     libraryDependencies += {
       val sv    = scalaVersion.value
       val swing = if (sv startsWith "2.10")
@@ -45,6 +49,9 @@ lazy val core = Project(
         "org.scala-lang.modules" %% "scala-swing" % "1.0.2"
       swing % "test"
     },
+    libraryDependencies ++= Seq(
+      "de.sciss" % "submin" % subminVersion % "test"
+    ),
     sourceGenerators in Compile <+= (java2DGenerator in Compile),
     java2DGenerator in Compile <<=
       (resourceDirectory   in Compile in gen,
@@ -84,7 +91,7 @@ lazy val core = Project(
 </developers>
     }
   )
-)
+
 
 def runJava2DGenerator(specDir: File, outputDir: File, cp: Seq[File], log: Logger): Seq[File] = {
   val outDir2     = outputDir / /* "java" / */ "de" / "sciss" / "icons" / "raphael"
@@ -109,10 +116,9 @@ def runJava2DGenerator(specDir: File, outputDir: File, cp: Seq[File], log: Logge
   sources
 }
 
-lazy val gen = Project(
-  id        = "generate",
-  base      = file("generate"),
-  settings  = commonSettings ++ Seq(
+lazy val gen = Project(id = "generate", base = file("generate"))
+  .settings(commonSettings)
+  .settings(
     libraryDependencies ++= Seq(
       "org.apache.xmlgraphics" % "batik-parser" % "1.7"
     ),
@@ -129,4 +135,4 @@ lazy val gen = Project(
         |}
         |""".stripMargin
   )
-)
+

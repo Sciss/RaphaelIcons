@@ -1,9 +1,17 @@
 package de.sciss.icons.raphael
 
-import scala.swing.{ToggleButton, FlowPanel, Button, Frame, MainFrame, SimpleSwingApplication}
+import scala.swing.{Button, FlowPanel, Frame, MainFrame, SimpleSwingApplication, ToggleButton}
 import java.awt.Font
 
+import de.sciss.submin.Submin
+
 object IconDemo extends SimpleSwingApplication {
+  override def startup(args: Array[String]): Unit = {
+    val isDark = args.contains("--dark")
+    Submin.install(isDark)
+    super.startup(args)
+  }
+
   lazy val top: Frame = new MainFrame {
     val b1 = new Button("Stop!") {
       icon = Icon(extent = 128)(Shapes.StopSign)
