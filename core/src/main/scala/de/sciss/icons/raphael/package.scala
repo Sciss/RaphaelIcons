@@ -1,8 +1,21 @@
+/*
+ *  package.java
+ *  (RaphaelIcons)
+ *
+ *  Copyright (c) 2013-2016 Hanns Holger Rutz. All rights reserved.
+ *
+ *	This software is published under the GNU Lesser General Public License v2.1+
+ *
+ *
+ *	For further information, please contact Hanns Holger Rutz at
+ *	contact@sciss.de
+ */
+
 package de.sciss.icons
 
 import java.awt.geom.{AffineTransform, Area, GeneralPath, Path2D}
-import java.awt.{Color, Component, Graphics, Graphics2D, LinearGradientPaint, Paint, RenderingHints, Shape}
-import javax.swing.UIManager
+import java.awt.{Color, GradientPaint, LinearGradientPaint, Paint, Shape}
+import javax.swing.{UIManager, Icon => JIcon}
 
 package object raphael {
   /** Creates a shape from a given shape function. */
@@ -14,19 +27,67 @@ package object raphael {
   }
 
   /** Special paint indicating no painting (fully translucent) */
-  val NoPaint     = new Color(0, 0, 0, 0): Paint
-  /** Standard OS X style textured icon shadow color */
-  val WhiteShadow = new Color(255, 255, 255, 127): Paint
+  val NoPaint             = new Color(0x00, 0x00, 0x00, 0x00): Paint
+  val WhiteShadow         = new Color(0xFF, 0xFF, 0xFF, 0x7F): Paint
+  val BlackShadow         = new Color(0x00, 0x00, 0x00, 0x7F): Paint
+  val WhiteShadowDisabled = new Color(0xFF, 0xFF, 0xFF, 0x2F): Paint
+  val BlackShadowDisabled = new Color(0x00, 0x00, 0x00, 0x2F): Paint
 
   private[this] lazy val isDarkSkin: Boolean = UIManager.getBoolean("dark-skin")
 
-  /** Standard OS X style textured icon foreground color. Uses a vertical gradient from black to gray. */
-  def TexturePaint(extent: Int = 32): Paint =
-    new LinearGradientPaint(0f, 0f, 0f, extent, Array(0f, 1f), Array(Color.black, new Color(96, 96, 96)))
+  private[this] val colrPlainLight    = Color.black
+  private[this] val colrPlainDark     = new Color(220, 200, 200)
+
+  private[this] val colrDimLight      = Color.darkGray
+  private[this] val colrDimDark       = new Color(160, 160, 160)
+
+  private[this] val colrTexTopLight   = Color.black
+  private[this] val colrTexBotLight   = new Color(96, 96, 96)
+  private[this] val colrTexTopDark    = new Color(140, 140, 140)
+  private[this] val colrTexBotDark    = new Color(240, 240, 240)
+  private[this] val colrTexTopLightD  = new Color(0x30, 0x30, 0x30, 0x50)
+  private[this] val colrTexBotLightD  = new Color(96, 96, 96, 0x50)
+  private[this] val colrTexTopDarkD   = new Color(140, 140, 140, 0x50)
+  private[this] val colrTexBotDarkD   = new Color(200, 200, 200, 0x50)
+  private[this] val colrPlainLightD   = colrTexTopLightD
+  private[this] val colrPlainDarkD    = new Color(200, 200, 200, 0x60)
+
+  def Shadow        : Paint = if (isDarkSkin) BlackShadow         else WhiteShadow
+  def ShadowDisabled: Paint = if (isDarkSkin) BlackShadowDisabled else WhiteShadowDisabled
+
+  /** Standard OS X style textured icon foreground color.
+    * Uses a vertical gradient from black to gray. On dark skin
+    * look uses whitish.
+    */
+  def TexturePaint(extent: Int = 32): Paint = {
+    val ct = if (isDarkSkin) colrTexTopDark else colrTexTopLight
+    val cb = if (isDarkSkin) colrTexBotDark else colrTexBotLight
+    new GradientPaint(0f, 0f, ct, 0f, extent, cb)
+  }
+
+  def TexturePaintDisabled(extent: Int = 32): Paint = {
+    val ct = if (isDarkSkin) colrTexTopDarkD else colrTexTopLightD
+    val cb = if (isDarkSkin) colrTexBotDarkD else colrTexBotLightD
+    new GradientPaint(0f, 0f, ct, 0f, extent, cb)
+  }
+
+  def PlainPaint        : Paint = if (isDarkSkin) colrPlainDark  else colrPlainLight
+  def PlainPaintDisabled: Paint = if (isDarkSkin) colrPlainDarkD else colrPlainLightD
+  def DimPaint          : Paint = if (isDarkSkin) colrDimDark    else colrDimLight
+
+  def DisabledIcon(extent: Int = 32, fill: Paint = PlainPaintDisabled, shadow: Paint = NoPaint)
+                  (fun: Path2D => Unit): JIcon =
+    Icon(extent = extent, fill = fill, shadow = shadow)(fun)
+
+  def TexturedIcon(extent: Int = 32)(fun: Path2D => Unit): JIcon =
+    Icon(extent = extent, fill = TexturePaint(extent), shadow = Shadow)(fun)
+
+  def TexturedDisabledIcon(extent: Int = 32)(fun: Path2D => Unit): JIcon =
+    Icon(extent = extent, fill = TexturePaintDisabled(extent), shadow = ShadowDisabled)(fun)
 
   /** Creates an icon from a given shape function. */
-  def Icon(extent: Int = 32, fill: Paint = Color.black, shadow: Paint = NoPaint)
-          (fun: Path2D => Unit): javax.swing.Icon = {
+  def Icon(extent: Int = 32, fill: Paint = PlainPaint, shadow: Paint = NoPaint)
+          (fun: Path2D => Unit): JIcon = {
     val p = new GeneralPath(Path2D.WIND_EVEN_ODD)
     fun(p)
     p.closePath()
@@ -49,41 +110,18 @@ package object raphael {
     }
 
     val darkShadow = if (!hasShadow) null else {
-      shadow match {
-        case c: Color => new Color(255 - c.getRed, 255 - c.getGreen, 255 - c.getBlue)
+//      shadow match {
+//        case c: Color => new Color(255 - c.getRed, 255 - c.getGreen, 255 - c.getBlue)
+//        case _ => Color.black // whatever
+//      }
+      fill match {
+        case c: Color => c.darker()
+        case p: GradientPaint => p.getColor1.darker()
+        case p: LinearGradientPaint => p.getColors.apply(0).darker()
         case _ => Color.black // whatever
       }
     }
 
     new IconImpl(extent, shape, fill, hasShadow, shadowInset, shadow, darkShadow)
-  }
-
-  private final class IconImpl(extent: Int, shape: Shape, fill: Paint, hasShadow: Boolean,
-                               shadowInset: Shape, lightShadow: Paint, darkShadow: Paint) extends javax.swing.Icon {
-    def paintIcon(c: Component, g: Graphics, x: Int, y: Int): Unit = {
-      val g2 = g.asInstanceOf[Graphics2D]
-      val hints = g2.getRenderingHints
-      val at    = g2.getTransform
-      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING  , RenderingHints.VALUE_ANTIALIAS_ON)
-      g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE )
-      g2.translate(x, y)
-      if (hasShadow) {
-        g2.setPaint(lightShadow)
-        g2.translate(0, 1)
-        g2.fill(shape)
-        g2.translate(0, -1)
-      }
-      g2.setPaint(fill)
-      g2.fill(shape)
-      if (hasShadow) {
-        g2.setPaint(darkShadow)
-        g2.fill(shadowInset)
-      }
-      g2.setTransform(at)
-      g2.setRenderingHints(hints)
-    }
-
-    def getIconWidth : Int = extent
-    def getIconHeight: Int = extent
   }
 }

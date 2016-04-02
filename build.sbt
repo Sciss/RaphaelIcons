@@ -2,6 +2,8 @@ lazy val projectName = "RaphaelIcons"
 
 name := projectName
 
+lazy val projectVersion = "1.0.3"
+
 // ---- test dependencies ----
 
 lazy val subminVersion = "0.1.0"
@@ -11,7 +13,7 @@ lazy val subminVersion = "0.1.0"
 def basicJavaOpts = Seq("-source", "1.6")
 
 lazy val commonSettings = Seq(
-  version            := "1.0.3-SNAPSHOT",
+  version            := projectVersion,
   organization       := "de.sciss",
   description        := "Icon set designed by Dmitry Baranovskiy",
   homepage           := Some(url(s"https://github.com/Sciss/$projectName")),

@@ -18,15 +18,20 @@ object IconDemo extends SimpleSwingApplication {
       font = new Font("Sans", Font.PLAIN, 56)
     }
 
-    val texIcon = Icon(extent = 24, fill = TexturePaint(24), shadow = WhiteShadow) _
+//    val texIcon = Icon(extent = 24, fill = TexturePaint(24), shadow = Shadow) _
 
     val b2 = new ToggleButton("View") {
-      icon          = texIcon(Shapes.View)
-      selectedIcon  = texIcon(Shapes.NoView)
-      peer.putClientProperty("JButton.buttonType", "textured")
+      icon          = TexturedIcon(24)(Shapes.View)
+      selectedIcon  = TexturedIcon(24)(Shapes.NoView)
     }
 
-    contents = new FlowPanel(b1, b2)
+    val b3 = new ToggleButton("View") {
+      icon          = TexturedIcon        (24)(Shapes.Coffee)
+      disabledIcon  = TexturedDisabledIcon(24)(Shapes.Coffee)
+      enabled       = false
+    }
+
+    contents = new FlowPanel(b1, b2, b3)
 
     title = "Icon Test"
     resizable = false

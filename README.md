@@ -17,7 +17,7 @@ Use the following dependency:
 
     "de.sciss" %% "raphael-icons" % v
 
-The current version `v` is `"1.0.2"`.
+The current version `v` is `"1.0.3"`.
 
 ## building
 
