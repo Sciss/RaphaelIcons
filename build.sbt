@@ -2,11 +2,13 @@ lazy val projectName = "RaphaelIcons"
 
 name := projectName
 
-lazy val projectVersion = "1.0.3"
+lazy val projectVersion = "1.0.4"
+lazy val mimaVersion    = "1.0.1"
 
 // ---- test dependencies ----
 
-lazy val subminVersion = "0.1.0"
+lazy val swingPlusVersion = "0.2.2"
+lazy val subminVersion    = "0.1.0"
 
 // ---- base settings ----
 
@@ -19,7 +21,7 @@ lazy val commonSettings = Seq(
   homepage           := Some(url(s"https://github.com/Sciss/$projectName")),
   licenses           := Seq("LGPL v2.1+" -> url("http://www.gnu.org/licenses/lgpl-2.1.txt")),
   scalaVersion       := "2.11.8",
-  crossScalaVersions := Seq("2.11.8", "2.10.6"),
+  crossScalaVersions := Seq("2.12.1", "2.11.8", "2.10.6"),
   javacOptions                   := basicJavaOpts ++ Seq("-target", "1.6", "-encoding", "UTF-8"),
   javacOptions in (Compile, doc) := basicJavaOpts,
   // retrieveManaged := true,
@@ -43,17 +45,11 @@ lazy val java2DGenerator = TaskKey[Seq[File]]("java2d-generate", "Generate Icon 
 lazy val core = Project(id = "raphael-icons", base = file("core"))
   .settings(commonSettings)
   .settings(
-    libraryDependencies += {
-      val sv    = scalaVersion.value
-      val swing = if (sv startsWith "2.10")
-        "org.scala-lang"         %  "scala-swing" % sv
-      else
-        "org.scala-lang.modules" %% "scala-swing" % "1.0.2"
-      swing % "test"
-    },
     libraryDependencies ++= Seq(
-      "de.sciss" % "submin" % subminVersion % "test"
+      "de.sciss" %% "swingplus" % swingPlusVersion % "test",
+      "de.sciss" %  "submin"    % subminVersion    % "test"
     ),
+    mimaPreviousArtifacts := Set("de.sciss" %% "raphael-icons" % mimaVersion),
     sourceGenerators in Compile <+= (java2DGenerator in Compile),
     java2DGenerator in Compile <<=
       (resourceDirectory   in Compile in gen,
