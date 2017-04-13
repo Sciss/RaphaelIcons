@@ -27,11 +27,11 @@ package object raphael {
   }
 
   /** Special paint indicating no painting (fully translucent) */
-  val NoPaint             = new Color(0x00, 0x00, 0x00, 0x00): Paint
-  val WhiteShadow         = new Color(0xFF, 0xFF, 0xFF, 0x7F): Paint
-  val BlackShadow         = new Color(0x00, 0x00, 0x00, 0x7F): Paint
-  val WhiteShadowDisabled = new Color(0xFF, 0xFF, 0xFF, 0x2F): Paint
-  val BlackShadowDisabled = new Color(0x00, 0x00, 0x00, 0x2F): Paint
+  val NoPaint            : Paint = new Color(0x00, 0x00, 0x00, 0x00)
+  val WhiteShadow        : Paint = new Color(0xFF, 0xFF, 0xFF, 0x7F)
+  val BlackShadow        : Paint = new Color(0x00, 0x00, 0x00, 0x7F)
+  val WhiteShadowDisabled: Paint = new Color(0xFF, 0xFF, 0xFF, 0x2F)
+  val BlackShadowDisabled: Paint = new Color(0x00, 0x00, 0x00, 0x2F)
 
   private[this] lazy val isDarkSkin: Boolean = UIManager.getBoolean("dark-skin")
 

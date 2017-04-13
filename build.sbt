@@ -2,13 +2,13 @@ lazy val projectName = "RaphaelIcons"
 
 name := projectName
 
-lazy val projectVersion = "1.0.4"
+lazy val projectVersion = "1.0.5-SNAPSHOT"
 lazy val mimaVersion    = "1.0.1"
 
 // ---- test dependencies ----
 
 lazy val swingPlusVersion = "0.2.2"
-lazy val subminVersion    = "0.1.0"
+lazy val subminVersion    = "0.2.1"
 
 // ---- base settings ----
 
@@ -20,7 +20,7 @@ lazy val commonSettings = Seq(
   description        := "Icon set designed by Dmitry Baranovskiy",
   homepage           := Some(url(s"https://github.com/Sciss/$projectName")),
   licenses           := Seq("LGPL v2.1+" -> url("http://www.gnu.org/licenses/lgpl-2.1.txt")),
-  scalaVersion       := "2.11.8",
+  scalaVersion       := "2.12.1",
   crossScalaVersions := Seq("2.12.1", "2.11.8", "2.10.6"),
   javacOptions                   := basicJavaOpts ++ Seq("-target", "1.6", "-encoding", "UTF-8"),
   javacOptions in (Compile, doc) := basicJavaOpts,
