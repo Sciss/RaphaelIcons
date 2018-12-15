@@ -17,11 +17,11 @@ Use the following dependency:
 
     "de.sciss" %% "raphael-icons" % v
 
-The current version `v` is `"1.0.4"`.
+The current version `v` is `"1.0.5"`.
 
 ## building
 
-Uses Scala 2.12, 2.11, 2.10 and sbt 0.13 for building. The actual icon class is synthesised into sub-project `core`, using the source generator provided in sub-project `generate`.
+Uses Scala 2.12, 2.11 and sbt for building. The actual icon class is synthesised into sub-project `core`, using the source generator provided in sub-project `generate`.
 
 To see the source generation, run `sbt generate/run`. To compile the core project, use `sbt raphael-icons/compile`. To run a demo, use `sbt raphael-icons/test:run`. There are two demos. `Demo` shows a matrix of all icons. Mouse mouse hover to see the icon names (method names in `Shapes.java`). `IconDemo` shows how to create a custom sized icon.
 

@@ -1,7 +1,8 @@
 package de.sciss.icons.raphael
 
-import org.apache.batik.parser.{PathHandler, PathParser}
 import java.io.StringWriter
+
+import org.apache.batik.parser.{PathHandler, PathParser}
 
 object Generate extends App {
   final val LOG_ENABLED = false
@@ -11,7 +12,7 @@ object Generate extends App {
   class Handler extends PathHandler {
     private val out     = new StringWriter()
     // private var gpIdx   = 0
-    private var path    = ""
+    // private var path    = ""
 
     private var x       = 0f
     private var y       = 0f

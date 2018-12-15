@@ -5,10 +5,17 @@ name := projectName
 lazy val projectVersion = "1.0.5-SNAPSHOT"
 lazy val mimaVersion    = "1.0.1"
 
-// ---- test dependencies ----
+// ---- dependencies ----
 
-lazy val swingPlusVersion = "0.2.2"
-lazy val subminVersion    = "0.2.1"
+lazy val deps = new {
+  val gen = new {
+    val batik     = "1.7"
+  }
+  val test = new {
+    val swingPlus = "0.4.0-SNAPSHOT"
+    val submin    = "0.2.3"
+  }
+}
 
 // ---- base settings ----
 
@@ -18,10 +25,10 @@ lazy val commonSettings = Seq(
   version            := projectVersion,
   organization       := "de.sciss",
   description        := "Icon set designed by Dmitry Baranovskiy",
-  homepage           := Some(url(s"https://github.com/Sciss/$projectName")),
+  homepage           := Some(url(s"https://git.iem.at/sciss/$projectName")),
   licenses           := Seq("LGPL v2.1+" -> url("http://www.gnu.org/licenses/lgpl-2.1.txt")),
-  scalaVersion       := "2.12.1",
-  crossScalaVersions := Seq("2.12.1", "2.11.8", "2.10.6"),
+  scalaVersion       := "2.12.8", // "2.13.0-M5",
+  crossScalaVersions := Seq("2.12.8", "2.11.12", "2.13.0-M5"),
   javacOptions                   := basicJavaOpts ++ Seq("-target", "1.6", "-encoding", "UTF-8"),
   javacOptions in (Compile, doc) := basicJavaOpts,
   // retrieveManaged := true,
@@ -33,7 +40,7 @@ lazy val commonSettings = Seq(
 
 // ---- sub-projects ----
 
-lazy val root = Project(id = "root", base = file("."))
+lazy val root = project.withId("root").in(file("."))
   .aggregate(core, gen)
   .settings(commonSettings)
   .settings(
@@ -42,22 +49,22 @@ lazy val root = Project(id = "root", base = file("."))
 
 lazy val java2DGenerator = TaskKey[Seq[File]]("java2d-generate", "Generate Icon Java2D source code")
 
-lazy val core = Project(id = "raphael-icons", base = file("core"))
+lazy val core = project.withId("raphael-icons").in(file("core"))
   .settings(commonSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "de.sciss" %% "swingplus" % swingPlusVersion % "test",
-      "de.sciss" %  "submin"    % subminVersion    % "test"
+      "de.sciss" %% "swingplus" % deps.test.swingPlus % Test,
+      "de.sciss" %  "submin"    % deps.test.submin    % Test
     ),
     mimaPreviousArtifacts := Set("de.sciss" %% "raphael-icons" % mimaVersion),
-    sourceGenerators in Compile <+= (java2DGenerator in Compile),
-    java2DGenerator in Compile <<=
-      (resourceDirectory   in Compile in gen,
-       sourceManaged       in Compile,
-       dependencyClasspath in Runtime in gen,
-       streams) map {
-        (spec, src, cp, st) => runJava2DGenerator(spec, src, cp.files, st.log)
-      },
+    sourceGenerators in Compile += (java2DGenerator in Compile).taskValue,
+    java2DGenerator in Compile := {
+      val spec = (resourceDirectory   in Compile in gen).value
+      val src  = (sourceManaged       in Compile).value
+      val cp   = (dependencyClasspath in Runtime in gen).value
+      val st   = streams.value
+      runJava2DGenerator(spec, src, cp.files, st.log)
+    },
     // ---- publishing ----
     // publishArtifact in (Compile, packageDoc) := false,
     // publishArtifact in (Compile, packageSrc) := false,
@@ -72,8 +79,8 @@ lazy val core = Project(id = "raphael-icons", base = file("core"))
     pomIncludeRepository := { _ => false },
     pomExtra := { val n = projectName
 <scm>
-  <url>git@github.com:Sciss/{n}.git</url>
-  <connection>scm:git:git@github.com:Sciss/{n}.git</connection>
+  <url>git@git.iem.at:sciss/{n}.git</url>
+  <connection>scm:git:git@git.iem.at:sciss/{n}.git</connection>
 </scm>
 <developers>
   <developer>
@@ -100,12 +107,11 @@ def runJava2DGenerator(specDir: File, outputDir: File, cp: Seq[File], log: Logge
   log.info("Generating Java2D source code...")
   try {
     val outs  = CustomOutput(os)  // Generate.scala writes the class source file to standard out
-    val p     = new Fork.ForkScala(mainClass).fork(javaHome = None, jvmOptions = Nil, scalaJars = cp,
-      arguments = Nil, workingDirectory = None,
-      connectInput = false, outputStrategy = outs)
-    val res = p.exitValue()
+    val fOpt  = ForkOptions(javaHome = Option.empty[File], outputStrategy = Some(outs), bootJars = cp.toVector,
+      workingDirectory = Option.empty[File], runJVMOptions = Vector.empty[String], connectInput = false, envVars = Map.empty[String, String])
+    val res: Int = Fork.scala(config = fOpt, arguments = mainClass :: Nil)
     if (res != 0) {
-      sys.error("Java2D class file generator failed with exit code " + res)
+      sys.error(s"Java2D class file generator failed with exit code $res")
     }
   } finally {
     os.close()
@@ -114,11 +120,12 @@ def runJava2DGenerator(specDir: File, outputDir: File, cp: Seq[File], log: Logge
   sources
 }
 
-lazy val gen = Project(id = "generate", base = file("generate"))
+lazy val gen = project.withId("generate").in(file("generate"))
   .settings(commonSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "org.apache.xmlgraphics" % "batik-parser" % "1.7"
+      "org.apache.xmlgraphics"  % "batik-parser"      % deps.gen.batik,
+      "org.scala-lang"          %  "scala-compiler"   % scalaVersion.value, // needed for Fork.scala
     ),
     initialCommands in console :=
       """import org.apache.batik.parser.{PathHandler, PathParser}
