@@ -5,7 +5,7 @@
 
 ## statement
 
-Translation of the Raphael icon suite by Dmitry Baranovskiy into a Java2D-based Scala library. Icon source made available from [raphaeljs.com/icons](http://raphaeljs.com/icons) under the [MIT License](http://raphaeljs.com/license.html). Library code (C)opyright 2013&ndash;2017 by Hanns Holger Rutz. All rights reserved. Released under the GNU LGPL v2.1+.
+Translation of the Raphael icon suite by Dmitry Baranovskiy into a Java2D-based Scala library. Icon source made available from [raphaeljs.com/icons](http://raphaeljs.com/icons) under the [MIT License](http://raphaeljs.com/license.html). Library code (C)opyright 2013&ndash;2018 by Hanns Holger Rutz. All rights reserved. Released under the GNU LGPL v2.1+.
 
 ## overview
 
@@ -31,5 +31,5 @@ Please see the file [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## reminder to self
 
-- to publish, `sbt raphael-icons/publish-signed`.
+- to publish, `sbt +raphael-icons/publishSigned`.
 - to try out path generation, `sbt generate/console` and then `path(<someString>)`.

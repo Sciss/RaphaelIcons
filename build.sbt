@@ -2,18 +2,18 @@ lazy val projectName = "RaphaelIcons"
 
 name := projectName
 
-lazy val projectVersion = "1.0.5-SNAPSHOT"
+lazy val projectVersion = "1.0.5"
 lazy val mimaVersion    = "1.0.1"
 
 // ---- dependencies ----
 
 lazy val deps = new {
   val gen = new {
-    val batik     = "1.7"
+    val batik     = "1.10"
   }
   val test = new {
-    val swingPlus = "0.4.0-SNAPSHOT"
-    val submin    = "0.2.3"
+    val swingPlus = "0.4.0"
+    val submin    = "0.2.4"
   }
 }
 
