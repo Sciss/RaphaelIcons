@@ -2,7 +2,7 @@ lazy val projectName = "RaphaelIcons"
 
 name := projectName
 
-lazy val projectVersion = "1.0.5"
+lazy val projectVersion = "1.0.6"
 lazy val mimaVersion    = "1.0.1"
 
 // ---- dependencies ----
@@ -12,8 +12,8 @@ lazy val deps = new {
     val batik     = "1.10"
   }
   val test = new {
-    val swingPlus = "0.4.0"
-    val submin    = "0.2.4"
+    val swingPlus = "0.4.2"
+    val submin    = "0.2.5"
   }
 }
 
@@ -28,13 +28,13 @@ lazy val commonSettings = Seq(
   homepage           := Some(url(s"https://git.iem.at/sciss/$projectName")),
   licenses           := Seq("LGPL v2.1+" -> url("http://www.gnu.org/licenses/lgpl-2.1.txt")),
   scalaVersion       := "2.12.8", // "2.13.0-M5",
-  crossScalaVersions := Seq("2.12.8", "2.11.12", "2.13.0-M5"),
+  crossScalaVersions := Seq("2.12.8", "2.11.12", "2.13.0-RC1"),
   javacOptions                   := basicJavaOpts ++ Seq("-target", "1.6", "-encoding", "UTF-8"),
   javacOptions in (Compile, doc) := basicJavaOpts,
   // retrieveManaged := true,
   scalacOptions  ++= Seq(
     // "-Xelide-below", "INFO", // elide debug logging!
-    "-deprecation", "-unchecked", "-feature", "-Xfuture", "-Xlint"
+    "-deprecation", "-unchecked", "-feature", "-Xlint", "-Xsource:2.13"
   )
 )
 
