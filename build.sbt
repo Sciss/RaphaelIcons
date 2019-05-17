@@ -36,7 +36,7 @@ lazy val commonSettings = Seq(
     // "-Xelide-below", "INFO", // elide debug logging!
     "-deprecation", "-unchecked", "-feature", "-Xlint", "-Xsource:2.13"
   )
-)
+) ++ publishSettings
 
 // ---- sub-projects ----
 
@@ -64,20 +64,21 @@ lazy val core = project.withId("raphael-icons").in(file("core"))
       val cp   = (dependencyClasspath in Runtime in gen).value
       val st   = streams.value
       runJava2DGenerator(spec, src, cp.files, st.log)
-    },
-    // ---- publishing ----
-    // publishArtifact in (Compile, packageDoc) := false,
-    // publishArtifact in (Compile, packageSrc) := false,
-    publishArtifact in Test := false,
-    publishMavenStyle := true,
-    publishTo :=
-      Some(if (isSnapshot.value)
-        "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
-      else
-        "Sonatype Releases"  at "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-      ),
-    pomIncludeRepository := { _ => false },
-    pomExtra := { val n = projectName
+    }
+  )
+
+lazy val publishSettings = Seq(
+  publishArtifact in Test := false,
+  publishMavenStyle := true,
+  publishTo := {
+    Some(if (isSnapshot.value)
+      "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+    else
+      "Sonatype Releases"  at "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+    )
+  },
+  pomIncludeRepository := { _ => false },
+  pomExtra := { val n = projectName
 <scm>
   <url>git@git.iem.at:sciss/{n}.git</url>
   <connection>scm:git:git@git.iem.at:sciss/{n}.git</connection>
@@ -94,8 +95,8 @@ lazy val core = project.withId("raphael-icons").in(file("core"))
     <url>http://dmitry.baranovskiy.com/</url>
   </developer>
 </developers>
-    }
-  )
+  }
+)
 
 
 def runJava2DGenerator(specDir: File, outputDir: File, cp: Seq[File], log: Logger): Seq[File] = {
@@ -123,6 +124,7 @@ def runJava2DGenerator(specDir: File, outputDir: File, cp: Seq[File], log: Logge
 lazy val gen = project.withId("generate").in(file("generate"))
   .settings(commonSettings)
   .settings(
+    packagedArtifacts := Map.empty,    // don't send this to Sonatype
     libraryDependencies ++= Seq(
       "org.apache.xmlgraphics"  % "batik-parser"      % deps.gen.batik,
       "org.scala-lang"          %  "scala-compiler"   % scalaVersion.value, // needed for Fork.scala

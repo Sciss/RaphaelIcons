@@ -31,5 +31,4 @@ Please see the file [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## reminder to self
 
-- to publish, `sbt +raphael-icons/publishSigned`.
 - to try out path generation, `sbt generate/console` and then `path(<someString>)`.
