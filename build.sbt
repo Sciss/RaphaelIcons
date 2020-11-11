@@ -2,24 +2,24 @@ lazy val projectName = "RaphaelIcons"
 
 name := projectName
 
-lazy val projectVersion = "1.0.6"
+lazy val projectVersion = "1.0.7"
 lazy val mimaVersion    = "1.0.1"
 
 // ---- dependencies ----
 
 lazy val deps = new {
   val gen = new {
-    val batik     = "1.10"
+    val batik     = "1.13"
   }
   val test = new {
-    val swingPlus = "0.4.2"
+    val swingPlus = "0.5.0"
     val submin    = "0.2.5"
   }
 }
 
 // ---- base settings ----
 
-def basicJavaOpts = Seq("-source", "1.6")
+def basicJavaOpts = Seq("-source", "1.8")
 
 lazy val commonSettings = Seq(
   version            := projectVersion,
@@ -27,15 +27,17 @@ lazy val commonSettings = Seq(
   description        := "Icon set designed by Dmitry Baranovskiy",
   homepage           := Some(url(s"https://git.iem.at/sciss/$projectName")),
   licenses           := Seq("LGPL v2.1+" -> url("http://www.gnu.org/licenses/lgpl-2.1.txt")),
-  scalaVersion       := "2.12.8", // "2.13.0-M5",
-  crossScalaVersions := Seq("2.12.8", "2.11.12", "2.13.0-RC1"),
-  javacOptions                   := basicJavaOpts ++ Seq("-target", "1.6", "-encoding", "UTF-8"),
+  scalaVersion       := "2.13.3",
+  crossScalaVersions := Seq("3.0.0-M1", "2.13.3", "2.12.12"),
+  javacOptions                   := basicJavaOpts ++ Seq("-target", "1.8", "-encoding", "UTF-8"),
   javacOptions in (Compile, doc) := basicJavaOpts,
   // retrieveManaged := true,
   scalacOptions  ++= Seq(
     // "-Xelide-below", "INFO", // elide debug logging!
     "-deprecation", "-unchecked", "-feature", "-Xlint", "-Xsource:2.13"
-  )
+  ),
+  scalacOptions in (Compile, compile) ++=
+    (if (scala.util.Properties.isJavaAtLeast("9")) Seq("-release", "8") else Nil), // JDK >8 may break API
 ) ++ publishSettings
 
 // ---- sub-projects ----
@@ -124,6 +126,7 @@ def runJava2DGenerator(specDir: File, outputDir: File, cp: Seq[File], log: Logge
 lazy val gen = project.withId("generate").in(file("generate"))
   .settings(commonSettings)
   .settings(
+    crossScalaVersions := Seq("2.13.3"),
     packagedArtifacts := Map.empty,    // don't send this to Sonatype
     libraryDependencies ++= Seq(
       "org.apache.xmlgraphics"  % "batik-parser"      % deps.gen.batik,

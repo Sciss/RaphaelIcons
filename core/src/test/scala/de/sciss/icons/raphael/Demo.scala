@@ -1,6 +1,6 @@
 package de.sciss.icons.raphael
 
-import java.awt.{Shape, RenderingHints, Color}
+import java.awt.{RenderingHints, Color}
 import scala.swing.{Swing, Graphics2D, Component, MainFrame, Frame, SimpleSwingApplication}
 import Swing._
 import java.awt.geom.{Path2D, GeneralPath}
