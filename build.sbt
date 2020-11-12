@@ -37,7 +37,7 @@ lazy val commonSettings = Seq(
     "-deprecation", "-unchecked", "-feature", "-Xlint", "-Xsource:2.13"
   ),
   scalacOptions in (Compile, compile) ++=
-    (if (scala.util.Properties.isJavaAtLeast("9")) Seq("-release", "8") else Nil), // JDK >8 may break API
+    (if (!isDotty.value && scala.util.Properties.isJavaAtLeast("9")) Seq("-release", "8") else Nil), // JDK >8 may break API
 ) ++ publishSettings
 
 // ---- sub-projects ----
