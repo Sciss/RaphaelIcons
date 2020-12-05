@@ -21,14 +21,18 @@ lazy val deps = new {
 
 def basicJavaOpts = Seq("-source", "1.8")
 
+// sonatype plugin requires that these are in global
+ThisBuild / version      := projectVersion
+ThisBuild / organization := "de.sciss"
+
 lazy val commonSettings = Seq(
-  version            := projectVersion,
-  organization       := "de.sciss",
+//  version            := projectVersion,
+//  organization       := "de.sciss",
   description        := "Icon set designed by Dmitry Baranovskiy",
   homepage           := Some(url(s"https://git.iem.at/sciss/$projectName")),
   licenses           := Seq("LGPL v2.1+" -> url("http://www.gnu.org/licenses/lgpl-2.1.txt")),
-  scalaVersion       := "2.13.3",
-  crossScalaVersions := Seq("3.0.0-M1", "2.13.3", "2.12.12"),
+  scalaVersion       := "2.13.4",
+  crossScalaVersions := Seq("3.0.0-M2", "2.13.4", "2.12.12"),
   javacOptions                   := basicJavaOpts ++ Seq("-target", "1.8", "-encoding", "UTF-8"),
   javacOptions in (Compile, doc) := basicJavaOpts,
   // retrieveManaged := true,
@@ -70,36 +74,29 @@ lazy val core = project.withId("raphael-icons").in(file("core"))
   )
 
 lazy val publishSettings = Seq(
-  publishArtifact in Test := false,
   publishMavenStyle := true,
-  publishTo := {
-    Some(if (isSnapshot.value)
-      "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
-    else
-      "Sonatype Releases"  at "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-    )
-  },
+  publishArtifact in Test := false,
   pomIncludeRepository := { _ => false },
-  pomExtra := { val n = projectName
-<scm>
-  <url>git@git.iem.at:sciss/{n}.git</url>
-  <connection>scm:git:git@git.iem.at:sciss/{n}.git</connection>
-</scm>
-<developers>
-  <developer>
-    <id>sciss</id>
-    <name>Hanns Holger Rutz</name>
-    <url>http://www.sciss.de</url>
-  </developer>
-  <developer>
-    <id>DmitryBaranovskiy</id>
-    <name>Dmitry Baranovskiy</name>
-    <url>http://dmitry.baranovskiy.com/</url>
-  </developer>
-</developers>
-  }
+  developers := List(
+    Developer(
+      id    = "sciss",
+      name  = "Hanns Holger Rutz",
+      email = "contact@sciss.de",
+      url   = url("https://www.sciss.de"),
+    ),
+    Developer(
+      id    = "DmitryBaranovskiy",
+      name  = "Dmitry Baranovskiy",
+      email = "dmitry@baranovskiy.com",
+      url   = url("http://dmitry.baranovskiy.com/"),
+    ),
+  ),
+  scmInfo := {
+    val h = "git.iem.at"
+    val a = s"sciss/$projectName"
+    Some(ScmInfo(url(s"https://$h/$a"), s"scm:git@$h:$a.git"))
+  },
 )
-
 
 def runJava2DGenerator(specDir: File, outputDir: File, cp: Seq[File], log: Logger): Seq[File] = {
   val outDir2     = outputDir / /* "java" / */ "de" / "sciss" / "icons" / "raphael"
@@ -126,11 +123,11 @@ def runJava2DGenerator(specDir: File, outputDir: File, cp: Seq[File], log: Logge
 lazy val gen = project.withId("generate").in(file("generate"))
   .settings(commonSettings)
   .settings(
-    crossScalaVersions := Seq("2.13.3"),
+    crossScalaVersions := Seq("2.13.4"),
     packagedArtifacts := Map.empty,    // don't send this to Sonatype
     libraryDependencies ++= Seq(
       "org.apache.xmlgraphics"  % "batik-parser"      % deps.gen.batik,
-      "org.scala-lang"          %  "scala-compiler"   % scalaVersion.value, // needed for Fork.scala
+      "org.scala-lang"          %  "scala-compiler"   % "2.13.4", // scalaVersion.value, // needed for Fork.scala -- note: sbt cross broken; we have to use explicit version here
     ),
     initialCommands in console :=
       """import org.apache.batik.parser.{PathHandler, PathParser}
